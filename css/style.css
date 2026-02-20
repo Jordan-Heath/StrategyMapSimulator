@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --button-color: lightblue;
+    --button-hover-color: lightskyblue;
+    --active-color: lightgreen;
+    --ui-color: rgba(255, 255, 255, 0.7);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+
+    font-family: "Noto Sans", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+
+    button {
+        cursor: pointer;
+        height: 30px;
+        min-width: 30px;
+        padding: 5px;
+        background-color: var(--button-color);
+
+        border: none;
+
+        &:hover {
+            background-color: var(--button-hover-color);
+        }
+    }
+}
+
+#assets {
+    display: none;
+}
+
+#selectedCountry {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+
+    background: var(--ui-color);
+    padding: 10px;
+    border-radius: 5px;
+
+    #selectedCountryName {
+        padding: 5px;
+        margin: 0;
+        border-radius: 5px;
+    }
+
+    table {
+        min-width: 180px;
+        table-layout: fixed;
+
+        th {
+            text-align: left;
+        }
+
+        td {
+            text-align: right;
+        }
+
+        th, td {
+            width: 100px;
+        }
+    }
+}
+
+#speedControls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+
+    background: var(--ui-color);
+    padding: 10px;
+    border-radius: 5px;
+
+    text-align: right;
+
+    #playPauseButton {
+        margin-top: 10px;
+    }
+
+    .active {
+        background: var(--active-color);
+    }
+}
+
+#controls {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1;
+
+    padding: 10px;
+    background: var(--ui-color);
+    border-radius: 5px;
+
+    display: flex;
+    flex-direction: column-reverse;
+
+    #terrainMenu {
+        margin-left: 50px;
+    }
+
+    .active {
+        background: var(--active-color);
+    }
+
+    .hidden {
+        display: none;
+    }
+}
+
+#scores {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1;
+
+    background: var(--ui-color);
+    padding: 10px;
+    border-radius: 5px;
+
+    .score-element {
+        display: block;
+        padding: 2px;
+        margin: 0;
+        border-radius: 5px;
+    }
+}
