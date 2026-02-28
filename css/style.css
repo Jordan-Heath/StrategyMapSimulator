@@ -1,35 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap');
 
 :root {
-    --button-color: lightblue;
-    --button-hover-color: lightskyblue;
-    --active-color: lightgreen;
-    --ui-color: rgba(255, 255, 255, 0.7);
+    /* Paper-themed color palette */
+    --paper-bg: #f4e9d8;
+    --paper-dark: #e8dccc;
+    --paper-shadow: #d8c8b0;
+    --ink-dark: #2c2c2c;
+    --ink-soft: #4a4a4a;
+    --accent-blood: #8b1e1e;
+    --accent-faded: #6b4f3c;
+    --accent-olive: #5c6b4a;
+    --border-old: #b89b80;
+    
+    /* UI Elements */
+    --ui-blur: none; /* No blur for paper look */
+    --ui-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    --ui-border-radius: 4px;
+    --ui-spacing: 12px;
+    
+    /* Paper texture */
+    background-color: #2c241a;
+    background-image: repeating-linear-gradient(45deg, 
+        rgba(160, 120, 80, 0.05) 0px,
+        rgba(160, 120, 80, 0.05) 10px,
+        transparent 10px,
+        transparent 30px
+    );
+    background-size: 40px 40px, 60px 60px, 80px 80px;
 }
 
 body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: black;
-
-    font-family: "Noto Sans", serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings: "wdth" 100;
-
-    button {
+    font-family: 'Courier Prime', monospace;
+    color: var(--ink-dark);
+    
+    & button {
+        font-family: 'Courier Prime', monospace;
         cursor: pointer;
-        height: 30px;
-        min-width: 30px;
-        padding: 5px;
-        background-color: var(--button-color);
-
-        border: none;
-
+        background-color: var(--paper-bg);
+        border: 2px solid var(--border-old);
+        color: var(--ink-dark);
+        box-shadow: var(--ui-shadow);
+        transition: all 0.1s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
         &:hover {
-            background-color: var(--button-hover-color);
+            background-color: var(--paper-dark);
+            transform: translate(-1px, -1px);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        &:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        &.active {
+            background-color: var(--accent-olive);
+            border-color: var(--accent-faded);
+            color: var(--paper-bg);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
         }
     }
 }
@@ -38,101 +72,545 @@ body {
     display: none;
 }
 
+#mapCanvas {
+    transform: translateZ(0);
+    image-rendering: pixelated;
+}
+
+img {
+    image-rendering: pixelated;
+}
+
+/* ===== Paper Panel Base Class ===== */
+.paper-panel {
+    background: var(--paper-bg);
+    border: 2px solid var(--border-old);
+    border-radius: var(--ui-border-radius);
+    padding: 12px;
+    box-shadow: var(--ui-shadow);
+    position: relative;
+    
+    /* Paper texture overlay */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            repeating-linear-gradient(45deg, 
+                rgba(0, 0, 0, 0.02) 0px, 
+                rgba(0, 0, 0, 0.02) 2px,
+                transparent 2px,
+                transparent 6px);
+        pointer-events: none;
+        border-radius: 2px;
+    }
+}
+
+/* ===== Selected Country Panel ===== */
 #selectedCountry {
     position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1;
+    top: var(--ui-spacing);
+    left: var(--ui-spacing);
+    z-index: 100;
+    min-width: 260px;
 
-    background: var(--ui-color);
-    padding: 10px;
-    border-radius: 5px;
-
-    #selectedCountryName {
-        padding: 5px;
-        margin: 0;
-        border-radius: 5px;
+    #closeSelectedCountryButton {
+        align-self: start;
     }
-
-    table {
-        min-width: 180px;
-        table-layout: fixed;
-
-        th {
+    
+    #selectedCountryName {
+        padding: 8px 12px;
+        margin: 0 0 12px 0;
+        background: var(--paper-dark);
+        border: 1px solid var(--border-old);
+        font-size: 1.4rem;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 1px;
+        font-family: 'Special Elite', cursive;
+        text-transform: uppercase;
+        border-radius: 2px;
+        width: 100%;
+    }
+    
+    & table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        
+        & th {
             text-align: left;
+            font-weight: 600;
+            color: var(--accent-faded);
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-old);
         }
-
-        td {
+        
+        & td {
             text-align: right;
+            font-weight: 400;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-old);
+            font-family: 'Courier Prime', monospace;
         }
-
-        th, td {
-            width: 100px;
+        
+        & u {
+            text-decoration: none;
+            font-weight: 700;
+            color: var(--accent-blood);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Zebra striping */
+        & tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.02);
         }
     }
 }
 
+/* ===== Speed Controls Panel ===== */
 #speedControls {
     position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-
-    background: var(--ui-color);
-    padding: 10px;
-    border-radius: 5px;
-
-    text-align: right;
-
-    #playPauseButton {
-        margin-top: 10px;
+    top: var(--ui-spacing);
+    right: var(--ui-spacing);
+    z-index: 100;
+    min-width: 220px;
+    
+    & #date {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        padding: 8px;
+        background: var(--paper-dark);
+        border: 1px solid var(--border-old);
+        text-align: center;
+        color: var(--accent-blood);
+        font-family: 'Special Elite', cursive;
+        border-radius: 2px;
     }
-
-    .active {
-        background: var(--active-color);
+    
+    & .speed-buttons {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 10px;
+        
+        & button {
+            flex: 1;
+            height: 32px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    & #playPauseButton {
+        width: 100%;
+        height: 36px;
+        font-size: 1.1rem;
+        background: var(--paper-dark);
+        border: 2px solid var(--border-old);
+        
+        &:hover {
+            background: var(--accent-blood);
+            border-color: var(--accent-blood);
+            color: var(--paper-bg);
+        }
     }
 }
 
+/* ===== Drawing Controls Panel ===== */
 #controls {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    z-index: 1;
-
-    padding: 10px;
-    background: var(--ui-color);
-    border-radius: 5px;
-
     display: flex;
     flex-direction: column-reverse;
-
-    #terrainMenu {
-        margin-left: 50px;
-    }
-
-    .active {
-        background: var(--active-color);
-    }
-
-    .hidden {
-        display: none;
+    gap: 12px;
+    position: fixed;
+    bottom: var(--ui-spacing);
+    left: var(--ui-spacing);
+    z-index: 100;
+    width: 100%;
+    max-width: 400px;
+    
+    & .control-buttons {
+        display: flex;
+        gap: 8px;
+        
+        & .control-button {
+            flex: 1;
+            height: 40px;
+            font-size: 0.9rem;
+        }
     }
 }
 
+/* Terrain Menu */
+#terrainMenu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed var(--border-old);
+    max-height: 200px;
+    overflow-y: auto;
+    
+    /* Vintage scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-faded) var(--paper-dark);
+    
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: var(--paper-dark);
+        border-left: 1px solid var(--border-old);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: var(--accent-faded);
+        border: 1px solid var(--border-old);
+    }
+    
+    & .terrain-button {
+        padding: 6px 12px;
+        background: var(--paper-dark);
+        border: 1px solid var(--border-old);
+        font-size: 0.85rem;
+        text-transform: capitalize;
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        
+        &:hover {
+            background: var(--accent-olive);
+            border-color: var(--accent-faded);
+            color: var(--paper-bg);
+        }
+        
+        &.active {
+            background: var(--accent-olive);
+            border-color: var(--accent-faded);
+            color: var(--paper-bg);
+            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+        }
+    }
+}
+
+/* ===== Scores Panel ===== */
 #scores {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1;
+    bottom: var(--ui-spacing);
+    right: var(--ui-spacing);
+    z-index: 100;
+    min-width: 200px;
+    max-width: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    /* Vintage scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-faded) var(--paper-dark);
+    
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: var(--paper-dark);
+        border-left: 1px solid var(--border-old);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: var(--accent-faded);
+        border: 1px solid var(--border-old);
+    }
+    
+    & .score-element {
+        padding: 6px 10px;
+        margin-bottom: 4px;
+        background: var(--paper-dark);
+        border: 1px solid var(--border-old);
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.1s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Courier Prime', monospace;
+        
+        &:hover {
+            transform: translateX(-2px);
+            background: var(--paper-bg);
+            border-left: 4px solid var(--accent-blood);
+        }
+        
+        /* Crossed out for dead countries */
+        &[style*="line-through"] {
+            opacity: 0.6;
+            text-decoration: line-through;
+            text-decoration-color: var(--accent-blood);
+            text-decoration-thickness: 2px;
+            
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+}
 
-    background: var(--ui-color);
-    padding: 10px;
-    border-radius: 5px;
+/* Add to style.css */
 
-    .score-element {
-        display: block;
-        padding: 2px;
-        margin: 0;
-        border-radius: 5px;
+/* Panel Header */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-old);
+    font-family: 'Special Elite', cursive;
+    font-weight: 700;
+    color: var(--accent-blood);
+    letter-spacing: 1px;
+
+    .panel-close-button {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 4px !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        color: var(--accent-faded) !important;
+        min-width: 24px !important;
+        height: 24px !important;
+        line-height: 1 !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        transition: all 0.1s ease !important;
+
+        &:hover {
+            color: var(--accent-blood) !important;
+            background: none !important;
+            transform: scale(1.1) !important;
+            box-shadow: none !important;
+        }
+
+        &:active {
+            transform: scale(0.95) !important;
+        }
+    }
+}
+
+/* Optional: Add a show button when hidden */
+.show-scores-button {
+    position: fixed;
+    bottom: var(--ui-spacing);
+    right: var(--ui-spacing);
+    z-index: 99;
+    padding: 8px 12px;
+    background: var(--paper-bg);
+    border: 2px solid var(--border-old);
+    border-radius: var(--ui-border-radius);
+    font-family: 'Special Elite', cursive;
+    font-weight: 700;
+    color: var(--accent-blood);
+    cursor: pointer;
+    box-shadow: var(--ui-shadow);
+    display: none;
+
+    &:hover {
+        background: var(--paper-dark);
+        transform: translate(-1px, -1px);
+        box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* When scores are hidden, show the button */
+#scores[style*="display: none"] + .show-scores-button {
+    display: block;
+}
+
+/* ===== Performance Monitor ===== */
+.performance-monitor {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px dashed var(--border-old);
+    font-size: 11px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 8px;
+    background: var(--paper-dark);
+    padding: 8px;
+    border: 1px solid var(--border-old);
+    position: relative;
+    
+    /* Paper texture */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            repeating-linear-gradient(45deg, 
+                rgba(0, 0, 0, 0.02) 0px, 
+                rgba(0, 0, 0, 0.02) 2px,
+                transparent 2px,
+                transparent 6px);
+        pointer-events: none;
+    }
+    
+    & .perf-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        white-space: nowrap;
+        font-family: 'Courier Prime', monospace;
+        
+        & .perf-label {
+            color: var(--accent-faded);
+            margin-right: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+        
+        & .perf-value {
+            color: var(--ink-dark);
+            font-weight: 700;
+            background: var(--paper-bg);
+            padding: 2px 4px;
+            border: 1px solid var(--border-old);
+            min-width: 40px;
+            text-align: right;
+        }
+    }
+    
+    & #perfFPS {
+        color: var(--accent-olive);
+    }
+    
+    & .perf-warning {
+        grid-column: span 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--accent-blood);
+        font-weight: 700;
+        padding: 4px;
+        background: rgba(139, 30, 30, 0.1);
+        border: 1px dashed var(--accent-blood);
+        margin-top: 4px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        animation: pulse 2s infinite;
+    }
+    
+    &:hover {
+        background: var(--paper-bg);
+        cursor: help;
+    }
+}
+
+/* ===== Utility Classes ===== */
+.hidden {
+    display: none !important;
+}
+
+/* ===== Animations ===== */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes inkBlot {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* Game paused indicator */
+.game-paused #playPauseButton {
+    animation: pulse 2s infinite;
+    background: var(--paper-dark);
+}
+
+/* ===== Loading State ===== */
+.loading #mapCanvas {
+    filter: sepia(0.5) blur(1px);
+}
+
+.loading::after {
+    content: "Generating World...";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--paper-bg);
+    padding: 20px 40px;
+    border: 3px solid var(--border-old);
+    color: var(--accent-blood);
+    font-weight: 700;
+    z-index: 1000;
+    font-family: 'Special Elite', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+    :root {
+        --ui-spacing: 8px;
+    }
+    
+    .paper-panel {
+        padding: 12px;
+    }
+    
+    #selectedCountry {
+        min-width: 200px;
+        font-size: 0.9rem;
+        
+        & table {
+            font-size: 0.85rem;
+        }
+    }
+    
+    #speedControls {
+        min-width: 180px;
+    }
+    
+    #scores {
+        max-width: 200px;
+        
+        & .score-element {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+        }
+    }
+    
+    #controls {
+        max-width: 300px;
+    }
+    
+    .performance-monitor {
+        font-size: 10px;
+        
+        & .perf-row .perf-label {
+            font-size: 9px;
+        }
     }
 }

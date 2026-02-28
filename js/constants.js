@@ -122,3 +122,6 @@ function findContrastingTextColor(color) {
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     return brightness > 128 ? 'black' : 'white';
 }
+
+const SHORTENED_DATE = true; // Set to false for full text dates (e.g., "28th of February 2000")
+const OPTIMISE_DISTANT_MAP = false; // stops drawing images when the camera is zoomed out.

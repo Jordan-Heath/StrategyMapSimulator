@@ -22,7 +22,8 @@ class UserInterface {
             defense: document.getElementById('selectedCountryDefense'),
             growth: document.getElementById('selectedCountryGrowth'),
             development: document.getElementById('selectedCountryDevelopment'),
-            governmentalStability: document.getElementById('selectedCountryGovernmentalStability')
+            governmentalStability: document.getElementById('selectedCountryGovernmentalStability'),
+            closeButton: document.getElementById('closeSelectedCountryButton')
         }
 
         // draw
@@ -42,21 +43,25 @@ class UserInterface {
         ]
 
         // scores
+        this.scoresContainer = document.getElementById('scores-container');
         this.scoresElement = document.getElementById('scores');
+        this.closeScoresButton = document.getElementById('closeScoresButton');
+        this.showScoresButton = document.getElementById('showScoresButton');
+        this.scoresVisible = true;
 
         // init
         this.attachEventListeners();
     }
 
     buildMenues() {
-        terrainMenu.innerHTML = '';
+        this.terrainMenu.innerHTML = '';
 
         Terrains.forEach(terrain => {
             const button = document.createElement('button');
             button.classList.add('terrain-button');
             button.innerHTML = terrain.name;
             button.onclick = () => this.terrainButtonListener(terrain.name);
-            terrainMenu.appendChild(button);
+            this.terrainMenu.appendChild(button);
             this.terrainButton[terrain.name] = button;
         });
     }
@@ -82,13 +87,22 @@ class UserInterface {
 
         // draw date
         let suffix = DaySuffixes[game.date.day] ?? 'th';
-        this.dateElements.day.innerHTML = game.date.day.toString() + suffix + ' of';
-        this.dateElements.month.innerHTML = Months[game.date.month];
-        this.dateElements.year.innerHTML = game.date.year.toString().padStart(4, '0');
+        if (SHORTENED_DATE) {
+            // Short format: 28/02/2000
+            const monthFormatted = (game.date.month + 1).toString().padStart(2, '0');
+            const dayFormatted = game.date.day.toString().padStart(2, '0');
+            this.dateElements.day.innerHTML = dayFormatted + " /";
+            this.dateElements.month.innerHTML = monthFormatted + " /"; // Clear month
+            this.dateElements.year.innerHTML = game.date.year.toString().padStart(4, '0');
+        } else {
+            // Long format: 28th of February 2000
+            this.dateElements.day.innerHTML = game.date.day.toString() + suffix + ' of';
+            this.dateElements.month.innerHTML = Months[game.date.month];
+            this.dateElements.year.innerHTML = game.date.year.toString().padStart(4, '0');
+        }
 
         // draw scores
-        this.scoresElement.innerHTML = '';
-
+        this.scoresContainer.innerHTML = '';
         let countries = game.countries.sort((a, b) => b.score - a.score);
 
         countries.forEach(country => {
@@ -98,7 +112,7 @@ class UserInterface {
             scoreElement.style.backgroundColor = country.color;
             scoreElement.style.color = country.textColor;
             if (country.size == 0) scoreElement.style.textDecoration = 'line-through';
-            this.scoresElement.appendChild(scoreElement);
+            this.scoresContainer.appendChild(scoreElement);
         });
     }
 
@@ -109,8 +123,13 @@ class UserInterface {
         this.moveButton.addEventListener('click', e => this.moveButtonListener(e));
         this.drawButton.addEventListener('click', e => this.drawButtonListener(e));
 
+        this.selectedCountryElements.closeButton.addEventListener('click', () => this.selectedCountry = null);
+
         this.playPauseButton.addEventListener('click', () => game.playPause());
         this.speedButtons.forEach((button, index) => button.addEventListener('click', () => game.changeSpeed(index)));
+
+        this.showScoresButton.addEventListener('click', () => this.toggleScores());
+        this.closeScoresButton.addEventListener('click', () => this.toggleScores());
     }
 
     terrainButtonListener(terrainType) {
@@ -153,5 +172,12 @@ class UserInterface {
         game.eventListeners.mouseDownListener = (e) => game.tileMap.startDrawingOnMap(e);
         game.eventListeners.mouseMoveListener = (e) => game.tileMap.drawingOnMap(e);
         game.eventListeners.mouseUpListener = (e) => game.tileMap.stopDrawingOnMap();
+    }
+
+    // Add this new method
+    toggleScores() {
+        this.scoresVisible = !this.scoresVisible;
+        this.scoresElement.style.display = this.scoresVisible ? 'block' : 'none';
+        this.showScoresButton.style.display = this.scoresVisible ? 'none' : 'block';
     }
 }

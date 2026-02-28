@@ -27,17 +27,18 @@ class Tile {
         }
     }
 
-    draw(x, y, size) {
-        const { ctx } = game.tileMap;
-        
+    draw(x, y, size, ctx, images) {
+        // const { ctx, images } = game.tileMap;
+
         // Draw terrain
-        if (size >= 20) {
-            ctx.drawImage(document.getElementById(this.terrain.name.toLowerCase()), x, y, size, size);
+        if (size >= 20 || !OPTIMISE_DISTANT_MAP) {
+            ctx.drawImage(images[this.terrain.name.toLowerCase()], x, y, size, size);
         } else {
             ctx.fillStyle = this.terrain.color;
             ctx.fillRect(x, y, size, size);
         }
 
+        // Highlight country
         if (this.country) {
             ctx.fillStyle = this.country.color;
             ctx.globalAlpha = 0.6;
@@ -45,6 +46,8 @@ class Tile {
             ctx.globalAlpha = 1;
         }
 
+
+        // Draw buildings
         const imageId = [
             "capital",
             "ruins2",
@@ -57,25 +60,25 @@ class Tile {
             "dock",
         ].find((id) => this.country?.capitalTile === this || this.buildings.includes(id));
 
-        if (imageId && (size >= 20 || ["capital", "ruins2", "ruins1", "ruins0"].includes(imageId))) {
-            ctx.drawImage(document.getElementById(imageId), x, y, size, size);
+        if (imageId && ((size >= 20 || !OPTIMISE_DISTANT_MAP) || ["capital", "ruins2", "ruins1", "ruins0"].includes(imageId))) {
+            ctx.drawImage(images[imageId], x, y, size, size);
         }
     }
 
     getNeighbours(tileMap = game.tileMap) {
+        if (this.neighbours.length > 0) return this.neighbours;
+
         const { mapData, mapWidth, mapHeight } = tileMap;
         const { x, y } = this;
         const neighbours = this.neighbours;
 
-        if (neighbours.length > 0) return neighbours;
-
-        // top
+        // Top
         if (y > 0) neighbours.push(mapData[y - 1][x]);
-        // bottom
+        // Bottom
         if (y < mapHeight - 1) neighbours.push(mapData[y + 1][x]);
-        // left
+        // Left
         neighbours.push(mapData[y][(x - 1 + mapWidth) % mapWidth]);
-        // right
+        // Right
         neighbours.push(mapData[y][(x + 1) % mapWidth]);
 
         return neighbours;
@@ -131,7 +134,7 @@ class Tile {
         if (country) {
             const distanceToCapital = country.distanceToCapital(this);
             const neighbouringTilesOwned = [...this.getNeighbours()].filter(tile => tile.country === country).length;
-            this.prosperity = (this.terrain.prosperity * this.development)/5 - distanceToCapital/25 + neighbouringTilesOwned/100;
+            this.prosperity = (this.terrain.prosperity * this.development) / 5 - distanceToCapital / 25 + neighbouringTilesOwned / 100;
         } else {
             this.prosperity = this.terrain.prosperity * this.development;
         }

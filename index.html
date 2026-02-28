@@ -7,25 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="assets/capital.png">    
+    <link rel="icon" href="assets/capital.png">
 </head>
 
 <body>
     <div id="assets">
         <!-- <img src="assets/populated.png" id="populated"> -->
         <img src="assets/capital.png" id="capital">
-
         <img src="assets/developed0.png" id="developed0">
         <img src="assets/developed1.png" id="developed1">
         <img src="assets/developed2.png" id="developed2">
         <img src="assets/developed3.png" id="developed3">
-
         <img src="assets/dock.png" id="dock">
-
         <img src="assets/ruins0.png" id="ruins0">
         <img src="assets/ruins1.png" id="ruins1">
         <img src="assets/ruins2.png" id="ruins2">
-
         <img src="assets/deepwater.png" id="deepwater">
         <img src="assets/water.png" id="water">
         <img src="assets/beach.png" id="beach">
@@ -34,80 +30,99 @@
         <img src="assets/mountain.png" id="mountain">
     </div>
 
+    <!-- Selected Country Panel -->
+    <div id="selectedCountry" class="paper-panel">
 
-    <div id="selectedCountry">
-        <h1 id="selectedCountryName">faction</h1>
+        <div class="panel-header">
+            <h1 id="selectedCountryName" class="country-name">faction</h1>
+            <button id="closeSelectedCountryButton" class="panel-close-button">✕</button>
+        </div>
 
-        <table>
+        <table class="country-stats">
             <tr>
                 <th colspan="2"><u>Country Score</u></th>
             </tr>
             <tr>
                 <th>Score</th>
-                <td id="selectedCountryScore">0</td>
+                <td id="selectedCountryScore" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Money</th>
-                <td id="selectedCountryMoney">0</td>
+                <td id="selectedCountryMoney" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Size</th>
-                <td id="selectedCountrySize">0</td>
+                <td id="selectedCountrySize" class="stat-value">0</td>
             </tr>
             <tr>
                 <th colspan="2"><u>Government Values</u></th>
             </tr>
             <tr>
                 <th>Stability</th>
-                <td id="selectedCountryGovernmentalStability">0</td>
+                <td id="selectedCountryGovernmentalStability" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Attack</th>
-                <td id="selectedCountryAttack">0</td>
+                <td id="selectedCountryAttack" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Defense</th>
-                <td id="selectedCountryDefense">0</td>
+                <td id="selectedCountryDefense" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Growth</th>
-                <td id="selectedCountryGrowth">0</td>
+                <td id="selectedCountryGrowth" class="stat-value">0</td>
             </tr>
             <tr>
                 <th>Development</th>
-                <td id="selectedCountryDevelopment">0</td>
+                <td id="selectedCountryDevelopment" class="stat-value">0</td>
             </tr>
-            
         </table>
     </div>
 
-    <div id="speedControls">
-        <div id="date">
+    <!-- Speed Controls Panel -->
+    <div id="speedControls" class="paper-panel">
+        <div id="date" class="date-display">
             <span id="day">1st</span>
             <span id="month">January</span>
             <span id="year">0000</span>
         </div>
-        <div>
-            <button id="speedButton0">I</button>
-            <button id="speedButton1">II</button>
-            <button id="speedButton2">III</button>
-            <button id="speedButton3">IV</button>
-            <button id="speedButton4">V</button>
+        <div class="speed-buttons">
+            <button id="speedButton0" class="speed-button">I</button>
+            <button id="speedButton1" class="speed-button">II</button>
+            <button id="speedButton2" class="speed-button">III</button>
+            <button id="speedButton3" class="speed-button">IV</button>
+            <button id="speedButton4" class="speed-button">V</button>
         </div>
-        <button id="playPauseButton">⏸︎</button>
+        <button id="playPauseButton" class="play-pause-button">⏸︎</button>
+        
+        <!-- Performance monitor will be inserted here by JS -->
     </div>
 
+    <!-- Map Canvas -->
     <canvas id="mapCanvas"></canvas>
 
-    <div id="controls">
-        <div>
+    <!-- Drawing Controls Panel -->
+    <div id="controls" class="paper-panel">
+        <div class="control-buttons">
             <button id="moveButton" class="control-button active">Move</button>
             <button id="drawButton" class="control-button">Draw</button>
         </div>
-        <div id="terrainMenu" class="hidden"><!-- populated by js --></div>
+        <div id="terrainMenu" class="terrain-menu hidden"><!-- populated by js --></div>
     </div>
 
-    <div id="scores"><!-- populated by js --></div>
+    <!-- Scores Panel -->
+    <div id="scores" class="paper-panel scores-panel">
+        <div class="panel-header">
+            <span>Leaderboard</span>
+            <button id="closeScoresButton" class="panel-close-button">✕</button>
+        </div>
+        <div id="scores-container"></div>
+        <!-- populated by js -->
+    </div>
+
+    <!-- Show Scores Button (hidden by default) -->
+    <button id="showScoresButton" class="show-scores-button" style="display: none;">📊 Leaderboard</button>
     
     <script src="js/userinterface.js"></script>
     <script src="js/country.js"></script>
@@ -115,6 +130,7 @@
     <script src="js/tile.js"></script>
     <script src="js/tilemap.js"></script>
     <script src="js/constants.js"></script>
+    <script src="js/performance.js"></script>
     <script src="js/game.js" defer></script>
 </body>
 </html>

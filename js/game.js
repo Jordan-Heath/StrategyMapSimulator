@@ -16,7 +16,7 @@ class Game {
             year: -200000
         }
 
-        this.framerate = 60;
+        this.framerate = 240;
         this.framerateInterval = 1000 / this.framerate;
         this.msPrevious = 0;
 
@@ -67,7 +67,7 @@ class Game {
         this.updateInterval = setInterval(() => this.updateLoop(), this.tickRate);
         this.drawLoop();
         this.attachEventListeners();
-        this.changeSpeed(1);
+        this.changeSpeed(0);
     }
 
     updateLoop() {
@@ -92,13 +92,18 @@ class Game {
     }
 
     update() {
-        this.countries.forEach(country => country.update());
+        const measure = perfTracker.startMeasure('update');
+        this.countries.forEach(country => { country.update(); });
         this.updateDate();
+        perfTracker.endMeasure(measure);
+        perfTracker.updateDisplay();
     }
-    
+
     draw() {
+        const measure = perfTracker.startMeasure('draw');
         this.tileMap.drawMap();
         this.userInterface.draw();
+        perfTracker.endMeasure(measure);
     }
 
     playPause() {
@@ -111,7 +116,7 @@ class Game {
 
         this.userInterface.playPauseButton.innerHTML = this.updateInterval ? '⏸︎' : '▶';
     }
-    
+
     changeSpeed(speed) {
         this.tickRate = this.tickRates[speed];
         clearInterval(this.updateInterval);

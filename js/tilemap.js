@@ -36,6 +36,24 @@ class TileMap {
             ruinFrequency: 25
         }
 
+        this.images = {
+            deepwater: document.getElementById('deepwater'),
+            water: document.getElementById('water'),
+            beach: document.getElementById('beach'),
+            grass: document.getElementById('grass'),
+            hill: document.getElementById('hill'),
+            mountain: document.getElementById('mountain'),
+            capital: document.getElementById('capital'),
+            developed0: document.getElementById('developed0'),
+            developed1: document.getElementById('developed1'),
+            developed2: document.getElementById('developed2'),
+            developed3: document.getElementById('developed3'),
+            dock: document.getElementById('dock'),
+            ruins0: document.getElementById('ruins0'),
+            ruins1: document.getElementById('ruins1'),
+            ruins2: document.getElementById('ruins2')
+        };
+
         this.init();
     }
 
@@ -43,13 +61,15 @@ class TileMap {
         const countries = game.countries;
 
         if (stage === 1) {
+            document.body.classList.add('loading');
+
             const elevationBiasMinimum = -3;
             const elevationBiasVariance = 5;
 
             for (let y = 0; y < this.mapHeight; y++) {
                 const yRatio = y / this.mapHeight;
                 const elevationBias = -(4 * elevationBiasVariance) * yRatio * yRatio + (4 * elevationBiasVariance) * yRatio + elevationBiasMinimum;
-                
+
                 this.mapData[y] = Array.from({ length: this.mapWidth }, (_, x) => new Tile(x, y, elevationBias));
             }
 
@@ -88,12 +108,14 @@ class TileMap {
             }
 
             console.log("Stage 3 Complete: Countries spawned");
-            game.userInterface.selectedCountry = countries[0];
+            // game.userInterface.selectedCountry = countries[0];
             setTimeout(() => this.generateRandomMap(4), game.tickRate);
             return;
         }
 
         if (stage === 4) {
+            document.body.classList.remove('loading');
+
             const emptyCountry = new Country('', '');
             let availableTiles = this.mapData.flat().filter(t => t.canByTakenBy(emptyCountry) && t.isUnclaimed());
 
@@ -109,31 +131,46 @@ class TileMap {
     }
 
     drawMap() {
-        // Clear the entire canvas
+        // Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Calculate the visible range of columns and rows based on current offset and tile size
         const startCol = Math.floor(this.offsetX / this.tileSize);
         const startRow = Math.floor(this.offsetY / this.tileSize);
-        const endCol = startCol + Math.ceil(this.canvas.width / this.tileSize) + 1;
-        const endRow = startRow + Math.ceil(this.canvas.height / this.tileSize) + 1;
+        const colsToDraw = Math.ceil(this.canvas.width / this.tileSize) + 1;
+        const rowsToDraw = Math.ceil(this.canvas.height / this.tileSize) + 1;
+        const endCol = startCol + colsToDraw;
+        const endRow = startRow + rowsToDraw;
 
-        // Loop through each tile in the visible range
+        // Store frequently accessed values locally
+        const mapData = this.mapData;
+        const mapWidth = this.mapWidth;
+        const tileSize = this.tileSize;
+        const offsetX = this.offsetX;
+        const offsetY = this.offsetY;
+        const ctx = this.ctx;
+        const images = this.images;
+
+        // Use standard for loops (fastest)
         for (let mapY = startRow; mapY < endRow; mapY++) {
+            const row = mapData[mapY];
+            if (!row) continue;
+
             for (let mapX = startCol; mapX < endCol; mapX++) {
-                // Adjust x for wrapping horizontally across the map
-                let rolloverX = mapX % this.mapWidth;
-                if (rolloverX < 0) rolloverX += this.mapWidth;
+                // Faster modulo for positive numbers
+                let rolloverX = mapX % mapWidth;
+                if (rolloverX < 0) rolloverX += mapWidth;
 
-                // Retrieve the tile at the current position
-                const tile = this.mapData[mapY]?.[rolloverX];
-
-                // Draw the tile if it exists
-                tile?.draw(
-                    mapX * this.tileSize - this.offsetX, 
-                    mapY * this.tileSize - this.offsetY, 
-                    this.tileSize
-                );
+                const tile = row[rolloverX];
+                if (tile) {
+                    tile.draw(
+                        mapX * tileSize - offsetX,
+                        mapY * tileSize - offsetY,
+                        tileSize,
+                        ctx,
+                        images
+                    );
+                }
             }
         }
     }
@@ -175,8 +212,6 @@ class TileMap {
 
             this.dragStartX = mouseX;
             this.dragStartY = mouseY;
-
-            this.drawMap();
         }
     }
 
@@ -218,14 +253,27 @@ class TileMap {
             let mapX = Math.floor((mouseX + this.offsetX) / this.tileSize);
             let mapY = Math.floor((mouseY + this.offsetY) / this.tileSize);
 
-            //rollover x
+            // Rollover X
             mapX = mapX % this.mapWidth;
             if (mapX < 0) mapX += this.mapWidth;
 
             const tile = this.mapData[mapY]?.[mapX];
             if (tile) {
                 tile.paintTerrain(game.userInterface.drawButtonSetting);
-                game.countries.forEach(country => country.refresh());
+                // Only refresh affected country, not all countries
+                if (tile.country) {
+                    tile.country.refresh();
+                } else {
+                    // Check if any neighbor country needs refresh
+                    const neighbors = tile.getNeighbours();
+                    const affectedCountries = new Set();
+                    for (const neighbor of neighbors) {
+                        if (neighbor.country) {
+                            affectedCountries.add(neighbor.country);
+                        }
+                    }
+                    affectedCountries.forEach(country => country.refresh());
+                }
             }
         }
     }
