@@ -31,7 +31,7 @@ class Tile {
         // const { ctx, images } = game.tileMap;
 
         // Draw terrain
-        if (size >= 20 || !OPTIMISE_DISTANT_MAP) {
+        if (size >= 15 || !OPTIMISE_DISTANT_MAP) {
             ctx.drawImage(images[this.terrain.name.toLowerCase()], x, y, size, size);
         } else {
             ctx.fillStyle = this.terrain.color;
@@ -60,7 +60,7 @@ class Tile {
             "dock",
         ].find((id) => this.country?.capitalTile === this || this.buildings.includes(id));
 
-        if (imageId && ((size >= 20 || !OPTIMISE_DISTANT_MAP) || ["capital", "ruins2", "ruins1", "ruins0"].includes(imageId))) {
+        if (imageId && ((size >= 15 || !OPTIMISE_DISTANT_MAP) || ["capital", "ruins2", "ruins1", "ruins0"].includes(imageId))) {
             ctx.drawImage(images[imageId], x, y, size, size);
         }
     }
